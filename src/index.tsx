@@ -1,12 +1,19 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import "./index.css";
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const canvas = document.getElementById("telegram-draw") as HTMLCanvasElement;
+const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: http://bit.ly/CRA-PWA
-serviceWorker.unregister();
+const dataURL = canvas.toDataURL();
+
+function mousePosition(event: any) {
+  const canvasRect = canvas.getBoundingClientRect();
+  const X = event.clientX - canvasRect.left;
+  const Y = event.clientY - canvasRect.top;
+  draw(X, Y);
+}
+
+function draw(x: number, y: number) {
+  ctx.fillRect(x, y, 5, 5);
+}
+
+canvas.addEventListener("mousemove", mousePosition);

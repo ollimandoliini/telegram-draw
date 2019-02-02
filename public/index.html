@@ -6,7 +6,21 @@
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="titlewrapper">Tervetuloa Ollin piirto-ohjelmaan =)</div>
-    <canvas id="telegram-draw" height="600" width="600"></canvas>
+    <div id="mainwrap">
+      <div id="canvasAndTools">
+      <canvas id="telegram-draw" height="600" width="600"></canvas>
+      <div id="tools"> Tools
+        <div id="colors"></div>
+        <div id="emojis"></div>
+      </div>
+    </div>
+      <div id="formwrapper"> 
+        <form action="" autocomplete="on">
+          <input type="text" placeholder="Bot Token" id="tokenInput"> 
+          <input type="text" placeholder="Chat ID" id="chatIdInput">
+           <button type="button">Send</button>
+           </form>
+          </div>
+    </div>
   </body>
 </html

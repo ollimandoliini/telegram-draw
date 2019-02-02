@@ -9,6 +9,49 @@ body {
   max-width: 800px;
 }
 
+#mainwrap {
+}
+
+#canvasAndTools {
+  display: flex;
+  max-height: 600px;
+}
+
 canvas {
   border: solid 1px black;
+  height: 600px;
+}
+
+#tools {
+  display: flex;
+  flex-direction: column;
+}
+
+#colors {
+  display: flex;
+  align-items: left;
+  justify-content: left;
+  flex-direction: row;
+  flex-wrap: wrap;
+  flex-flow: row wrap;
+  align-content: flex-end;
+}
+.colorbtn {
+  height: 30px;
+  width: 30px;
+}
+
+#emojis {
+  font-size: 30px;
+  display: flex;
+  align-items: left;
+  justify-content: left;
+  flex-direction: row;
+  flex-wrap: wrap;
+  flex-flow: row wrap;
+  align-content: flex-end;
+}
+.emojibtn {
+  font-size: 28px;
+  height: 40px;
 }

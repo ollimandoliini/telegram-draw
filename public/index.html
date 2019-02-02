@@ -8,19 +8,32 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="mainwrap">
       <div id="canvasAndTools">
-      <canvas id="telegram-draw" height="600" width="600"></canvas>
-      <div id="tools"> Tools
-        <div id="colors"></div>
-        <div id="emojis"></div>
+        <canvas id="telegram-draw" height="600" width="600"></canvas>
+        <div id="tools">
+          Tools
+          <div id="colors"></div>
+          <div id="emojis"></div>
+        </div>
+      </div>
+      <div id="formwrapper">
+        <form action="" autocomplete="on" id="sendForm">
+          <input
+            type="text"
+            placeholder="Bot Token"
+            id="tokenInput"
+            value=""
+            autocomplete="on"
+          />
+          <input
+            type="text"
+            placeholder="Chat ID"
+            id="chatIdInput"
+            value=""
+            autocomplete="on"
+          />
+          <button type="submit" id="sendButton">Send</button>
+        </form>
       </div>
     </div>
-      <div id="formwrapper"> 
-        <form action="" autocomplete="on" id="sendForm">
-          <input type="text" placeholder="Bot Token" id="tokenInput" value="" autocomplete="on"> 
-          <input type="text" placeholder="Chat ID" id="chatIdInput" value="" autocomplete="on">
-           <button type="submit" id="sendButton" >Send</button>
-           </form>
-          </div>
-    </div>
   </body>
-</html
+</html>

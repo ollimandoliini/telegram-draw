@@ -97,13 +97,17 @@ function init() {
   createEmojiMenu(settingsEmojis);
 }
 
-const sendform = document.getElementById("sendForm") as HTMLFormElement;
+const sendForm = document.getElementById("sendForm") as HTMLFormElement;
 const tokenInput = document.getElementById("tokenInput") as HTMLInputElement;
 const chatIdInput = document.getElementById("chatIdInput") as HTMLInputElement;
+const captionInput = document.getElementById(
+  "captionInput"
+) as HTMLInputElement;
 const sendButton = document.getElementById("sendButton") as HTMLButtonElement;
 
 let botToken = "";
 let chatId = "";
+let caption = "";
 
 tokenInput.addEventListener("input", function() {
   botToken = this.value;
@@ -111,8 +115,11 @@ tokenInput.addEventListener("input", function() {
 chatIdInput.addEventListener("input", function() {
   chatId = this.value;
 });
+captionInput.addEventListener("input", function() {
+  caption = this.value;
+});
 
-sendform.addEventListener("submit", e => {
+sendForm.addEventListener("submit", e => {
   e.preventDefault();
   submitImage();
 });
@@ -131,7 +138,7 @@ function dataUrlToFormData(dataUrl: any) {
 
 function submitImage() {
   const canvasImageFormData = dataUrlToFormData(canvas.toDataURL());
-  const sendPhotoApiUrl = `https://api.telegram.org/${botToken}/sendPhoto?chat_id=${chatId}`;
+  const sendPhotoApiUrl = `https://api.telegram.org/${botToken}/sendPhoto?chat_id=${chatId}&caption=${caption}`;
   fetch(sendPhotoApiUrl, {
     method: "POST",
     body: canvasImageFormData

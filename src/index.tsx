@@ -97,6 +97,7 @@ function init() {
   createEmojiMenu(settingsEmojis);
 }
 
+const sendform = document.getElementById("sendForm") as HTMLFormElement;
 const tokenInput = document.getElementById("tokenInput") as HTMLInputElement;
 const chatIdInput = document.getElementById("chatIdInput") as HTMLInputElement;
 const sendButton = document.getElementById("sendButton") as HTMLButtonElement;
@@ -104,6 +105,36 @@ const sendButton = document.getElementById("sendButton") as HTMLButtonElement;
 let botToken = "";
 let chatId = "";
 
-tokenInput.addEventListener("input", e => console.log(e));
+tokenInput.addEventListener("input", function() {
+  botToken = this.value;
+});
+chatIdInput.addEventListener("input", function() {
+  chatId = this.value;
+});
 
+sendform.addEventListener("submit", e => {
+  e.preventDefault();
+  submitImage();
+});
+
+function dataUrlToFormData(dataUrl: any) {
+  const blobBin = atob(dataUrl.split(",")[1]);
+  const array = [];
+  for (let i = 0; i < blobBin.length; i++) {
+    array.push(blobBin.charCodeAt(i));
+  }
+  const file = new Blob([new Uint8Array(array)], { type: "image/png" });
+  const formData = new FormData();
+  formData.append("photo", file);
+  return formData;
+}
+
+function submitImage() {
+  const canvasImageFormData = dataUrlToFormData(canvas.toDataURL());
+  const sendPhotoApiUrl = `https://api.telegram.org/${botToken}/sendPhoto?chat_id=${chatId}`;
+  fetch(sendPhotoApiUrl, {
+    method: "POST",
+    body: canvasImageFormData
+  });
+}
 init();

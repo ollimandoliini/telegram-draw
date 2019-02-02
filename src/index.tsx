@@ -97,4 +97,13 @@ function init() {
   createEmojiMenu(settingsEmojis);
 }
 
+const tokenInput = document.getElementById("tokenInput") as HTMLInputElement;
+const chatIdInput = document.getElementById("chatIdInput") as HTMLInputElement;
+const sendButton = document.getElementById("sendButton") as HTMLButtonElement;
+
+let botToken = "";
+let chatId = "";
+
+tokenInput.addEventListener("input", e => console.log(e));
+
 init();

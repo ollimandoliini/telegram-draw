@@ -15,43 +15,117 @@ const settings = {
 const settingsEmojis = toolsFile.emojis;
 const settingsColors = toolsFile.colors;
 
-canvas.addEventListener("mousemove", e => {
-  draw(e);
+let mouseDown = false;
+canvas.addEventListener("mousedown", e => {
+  mouseDown = true;
+  setPosition(e);
 });
-canvas.addEventListener("mouseenter", setPosition);
-canvas.addEventListener("mousedown", setPosition);
-canvas.addEventListener("click", clickHandler);
+canvas.addEventListener("mouseup", () => {
+  mouseDown = false;
+  newRecord();
+});
+canvas.addEventListener("mouseout", () => {
+  mouseDown = false;
+  newRecord();
+});
 
-function clickHandler() {
-  if (settings.mode === "draw") {
-    ctx.fillStyle = settings.selectedColor;
-    ctx.fillRect(pos.x, pos.y, settings.drawWidth, settings.drawWidth);
+canvas.addEventListener("mousemove", e => {
+  addLineStroke(e);
+});
+
+// const eventHistory: [number, number][][] = [];
+
+interface InterfaceLineStroke {
+  startx: number;
+  starty: number;
+  endx: number;
+  endy: number;
+  width: number;
+  color: string;
+}
+
+type Line = InterfaceLineStroke[];
+
+// todo: tyyppien checkaus
+
+interface InterfaceEmoji {
+  emoji: string;
+  size: number;
+  posx: number;
+  posy: number;
+}
+
+type CanvasEvent = InterfaceEmoji[] | Line;
+
+const eventHistory: InterfaceLineStroke[][] = [[]];
+const eventRecord: Line = [];
+let lineStroke: InterfaceLineStroke = {
+  startx: 0,
+  starty: 0,
+  endx: 0,
+  endy: 0,
+  width: 2,
+  color: "black"
+};
+
+function addLineStroke(e: MouseEvent) {
+  if (mouseDown === true) {
+    const start = { ...pos };
+    setPosition(e);
+    const end = { ...pos };
+
+    lineStroke = {
+      startx: start.x,
+      starty: start.y,
+      endx: end.x,
+      endy: end.y,
+      width: lineStroke.width,
+      color: lineStroke.color
+    };
+    const lastEvent: InterfaceLineStroke[] =
+      eventHistory[eventHistory.length - 1];
+
+    lastEvent.push(lineStroke);
   }
-  if (settings.mode === "emoji") {
-    addEmoji(settings.selectedEmoji, 60);
+}
+
+function newRecord() {
+  if (eventRecord.length > 0) {
+    eventHistory.push([]);
   }
 }
 
 function setPosition(e: any) {
   pos.x = e.clientX - canvas.offsetLeft;
   pos.y = e.clientY - canvas.offsetTop;
+  const position = {
+    x: e.clientX - canvas.offsetLeft,
+    y: e.clientY - canvas.offsetTop
+  };
+  return position;
 }
 
-function draw(e: MouseEvent) {
-  if (settings.mode !== "draw") {
-    return;
-  }
-  if (e.buttons !== 1) {
-    return;
-  }
+function render() {
+  eventHistory.forEach(renderLine);
+}
+
+function renderStroke(stroke: InterfaceLineStroke) {
   ctx.beginPath();
-  ctx.lineWidth = settings.drawWidth;
-  ctx.strokeStyle = settings.selectedColor;
-  ctx.moveTo(pos.x, pos.y);
-  setPosition(e);
-  ctx.lineTo(pos.x, pos.y);
+  ctx.lineWidth = stroke.width;
+  ctx.strokeStyle = stroke.color;
+  ctx.moveTo(stroke.startx, stroke.starty);
+  ctx.lineTo(stroke.endx, stroke.endy);
   ctx.stroke();
 }
+function renderLine(line: InterfaceLineStroke[]) {
+  line.forEach(renderStroke);
+}
+
+function mainLoop() {
+  render();
+  requestAnimationFrame(mainLoop);
+}
+requestAnimationFrame(mainLoop);
 
 function addEmoji(emoji: string, size: number) {
   ctx.font = size.toString() + "px Arial";

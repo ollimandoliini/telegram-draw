@@ -22,18 +22,35 @@ canvas.addEventListener("mousedown", e => {
 });
 canvas.addEventListener("mouseup", () => {
   mouseDown = false;
-  newRecord();
+  createNewLine();
 });
 canvas.addEventListener("mouseout", () => {
   mouseDown = false;
-  newRecord();
+  createNewLine();
 });
 
 canvas.addEventListener("mousemove", e => {
   addLineStroke(e);
 });
 
-// const eventHistory: [number, number][][] = [];
+canvas.addEventListener("click", e => {
+  if (settings.mode === "emoji") {
+    addEmoji(e);
+  }
+  if (settings.mode === "draw") {
+  }
+});
+
+function addEmoji(e: MouseEvent) {
+  const newEmoji: InterfaceEmoji = {
+    type: "emoji",
+    emoji: settings.selectedEmoji,
+    size: 40,
+    posx: e.clientX - canvas.offsetLeft,
+    posy: e.clientY - canvas.offsetTop
+  };
+  eventHistory.push(newEmoji);
+}
 
 interface InterfaceLineStroke {
   startx: number;
@@ -44,54 +61,59 @@ interface InterfaceLineStroke {
   color: string;
 }
 
-type Line = InterfaceLineStroke[];
+interface InterfaceLine {
+  type: "line";
+  strokes: InterfaceLineStroke[];
+}
 
 // todo: tyyppien checkaus
 
 interface InterfaceEmoji {
+  type: "emoji";
   emoji: string;
   size: number;
   posx: number;
   posy: number;
 }
 
-type CanvasEvent = InterfaceEmoji[] | Line;
+type CanvasEvent = InterfaceEmoji | InterfaceLine;
 
-const eventHistory: InterfaceLineStroke[][] = [[]];
-const eventRecord: Line = [];
-let lineStroke: InterfaceLineStroke = {
-  startx: 0,
-  starty: 0,
-  endx: 0,
-  endy: 0,
-  width: 2,
-  color: "black"
-};
+const eventHistory: CanvasEvent[] = [];
+const newLine: InterfaceLine = { type: "line", strokes: [] };
 
 function addLineStroke(e: MouseEvent) {
+  if (settings.mode !== "draw") {
+    return;
+  }
   if (mouseDown === true) {
     const start = { ...pos };
     setPosition(e);
     const end = { ...pos };
 
-    lineStroke = {
+    const lineStroke = {
       startx: start.x,
       starty: start.y,
       endx: end.x,
       endy: end.y,
-      width: lineStroke.width,
-      color: lineStroke.color
+      width: settings.drawWidth,
+      color: settings.selectedColor
     };
-    const lastEvent: InterfaceLineStroke[] =
-      eventHistory[eventHistory.length - 1];
 
-    lastEvent.push(lineStroke);
+    const latestEvent = eventHistory[eventHistory.length - 1];
+    if (!latestEvent || latestEvent.type !== "line") {
+      // katotaas..
+      eventHistory.push({ ...newLine, strokes: [lineStroke] });
+    } else {
+      latestEvent.strokes.push(lineStroke);
+      return;
+    }
   }
 }
+// katon täältä ulkoo :D
 
-function newRecord() {
-  if (eventRecord.length > 0) {
-    eventHistory.push([]);
+function createNewLine() {
+  if (newLine.strokes.length > 0) {
+    eventHistory.push({ type: "line", strokes: [] });
   }
 }
 
@@ -105,8 +127,17 @@ function setPosition(e: any) {
   return position;
 }
 
-function render() {
-  eventHistory.forEach(renderLine);
+function renderHistory() {
+  eventHistory.forEach(renderEvent);
+}
+
+function renderEvent(event: CanvasEvent) {
+  if (event.type === "line") {
+    renderLine(event);
+  }
+  if (event.type === "emoji") {
+    renderEmoji(event);
+  }
 }
 
 function renderStroke(stroke: InterfaceLineStroke) {
@@ -117,21 +148,22 @@ function renderStroke(stroke: InterfaceLineStroke) {
   ctx.lineTo(stroke.endx, stroke.endy);
   ctx.stroke();
 }
-function renderLine(line: InterfaceLineStroke[]) {
-  line.forEach(renderStroke);
+function renderLine(line: InterfaceLine) {
+  line.strokes.forEach(renderStroke);
 }
 
 function mainLoop() {
-  render();
+  renderHistory();
   requestAnimationFrame(mainLoop);
 }
 requestAnimationFrame(mainLoop);
 
-function addEmoji(emoji: string, size: number) {
-  ctx.font = size.toString() + "px Arial";
+function renderEmoji(emoji: InterfaceEmoji) {
+  ctx.font = emoji.size.toString() + "px Arial";
   ctx.textAlign = "center";
-  ctx.fillText(emoji, pos.x, pos.y);
+  ctx.fillText(emoji.emoji, emoji.posx, emoji.posy);
 }
+
 function createColorMenu(colors: string[]) {
   const colorContainer = document.getElementById("colors") as HTMLDivElement;
 
@@ -179,14 +211,16 @@ const captionInput = document.getElementById(
 ) as HTMLInputElement;
 const sendButton = document.getElementById("sendButton") as HTMLButtonElement;
 
-let botToken = "";
-let chatId = "";
+let botToken = window.localStorage.getItem("botToken") || "";
+let chatId = window.localStorage.getItem("chatId") || "";
 let caption = "";
 
 tokenInput.addEventListener("input", function() {
+  window.localStorage.setItem("botToken", this.value);
   botToken = this.value;
 });
 chatIdInput.addEventListener("input", function() {
+  window.localStorage.setItem("chatId", this.value);
   chatId = this.value;
 });
 captionInput.addEventListener("input", function() {

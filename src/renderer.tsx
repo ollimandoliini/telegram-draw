@@ -28,6 +28,7 @@ interface InterfaceEmoji {
 type CanvasEvent = InterfaceEmoji | InterfaceLine;
 
 export function renderHistory(history: CanvasEvent[]) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   history.forEach(renderEvent);
 }
 
